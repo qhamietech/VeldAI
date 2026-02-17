@@ -1,4 +1,4 @@
-VeldAI: Inclusive Agricultural Intelligence
+# **VELDAI: INCLUSIVE AGRICULTURAL INTELLIGENCE**
 
 VeldAI is a high-fidelity mobile solution engineered to close the lethal expertise gap facing millions of underserved small-scale farmers. By synthesizing multilingual Voice-to-Voice AI with instant Computer Vision triage, VeldAI provides a digital lifeline for crop diagnostics in "Data Deserts" where connectivity and literacy barriers have traditionally made AgriTech inaccessible.
 
