@@ -1,73 +1,35 @@
-# React + TypeScript + Vite
+VeldAI: Inclusive Agricultural Intelligence
+VeldAI is a high-fidelity mobile solution engineered to close the lethal expertise gap facing millions of underserved small-scale farmers. By synthesizing multilingual Voice-to-Voice AI with instant Computer Vision triage, VeldAI provides a digital lifeline for crop diagnostics in "Data Deserts" where connectivity and literacy barriers have traditionally made AgriTech inaccessible.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+🚀 The Mission: Bridging the "Data Desert"
+While modern agriculture is evolving rapidly, 33 million smallholder farmers across Africa are often left behind due to a lack of data connectivity or native-language support. VeldAI is built with a Field-Resilient philosophy, ensuring that high-level agronomic advice is available 24/7, regardless of location or literacy level.
 
-Currently, two official plugins are available:
+🛠️ Technical Stack & Architecture
+VeldAI is built using a modern, type-safe stack designed for performance in low-bandwidth environments:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Frontend Framework: React 19 — Utilizing concurrent rendering for a fluid mobile experience.
 
-## React Compiler
+Language: TypeScript — Ensuring robust data pipelines across complex AI service layers.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Styling: Tailwind CSS v4 — Mobile-first utility architecture for rapid UI deployment.
 
-## Expanding the ESLint configuration
+Build Tool: Vite — Optimized production bundles for minimal data usage.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Persistence: IndexedDB — Powering our Offline-First "Sync-Later" capability for functionality without internet.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+🧠 Core Features
+Voice-to-Voice Pipeline: Processes native dialects, bypassing the need for text-based interaction.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Instant Visual Triage: Immediate pathogen identification and treatment advice via on-device camera scans.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Sync-Later Architecture: Seamlessly stores field data locally and synchronizes with the cloud once a connection is re-established.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+📈 Future Roadmap
+Phase 1 (MVP): Finalize the React/Vite core and deploy the offline-sync module.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Phase 2 (Expansion): Integrate secondary crop categories (Legumes, Tubers) and refine Computer Vision accuracy to 95%.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+Phase 3 (Scale): Partner with local cooperatives to integrate hyper-local market pricing directly into the dashboard.
+
+👤 Author
+Qhamisa Tobie Full-Stack Engineer & Product Strategist
