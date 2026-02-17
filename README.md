@@ -2,7 +2,7 @@
 
 VeldAI is a high-fidelity mobile solution engineered to close the lethal expertise gap facing millions of underserved small-scale farmers. By synthesizing multilingual Voice-to-Voice AI with instant Computer Vision triage, VeldAI provides a digital lifeline for crop diagnostics in "Data Deserts" where connectivity and literacy barriers have traditionally made AgriTech inaccessible.
 
-🚀 The Mission: Bridging the "Data Desert"
+🚀 ## **The Mission: Bridging the "Data Desert"**
 While modern agriculture is evolving rapidly, 33 million smallholder farmers across Africa are often left behind due to a lack of data connectivity or native-language support. VeldAI is built with a Field-Resilient philosophy, ensuring that high-level agronomic advice is available 24/7, regardless of location or literacy level.
 
 🛠️ Technical Stack & Architecture
