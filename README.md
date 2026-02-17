@@ -1,7 +1,4 @@
 # **VELDAI: INCLUSIVE AGRICULTURAL INTELLIGENCE**
-Live Prototype: veld-ai-iw21.vercel.app
-
-Mission: Bridging the "Data Desert" for 33 Million Smallholder Farmers.
 
 VeldAI is a high-fidelity mobile solution engineered to close the lethal expertise gap facing millions of underserved small-scale farmers. By synthesizing multilingual Voice-to-Voice AI with instant Computer Vision triage, VeldAI provides a digital lifeline for crop diagnostics in "Data Deserts" where connectivity and literacy barriers have traditionally made AgriTech inaccessible.
 
