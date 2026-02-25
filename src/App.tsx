@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -18,7 +18,7 @@ export default function App() {
   return (
     <main className="min-h-screen overflow-hidden bg-white">
       <style>{`
-        @import url('[https://fonts.googleapis.com/css2?family=Inter:wght@900&family=Roboto:wght@400;500&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@900&family=Roboto:wght@400;500&display=swap)');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&family=Roboto:wght@400;500&display=swap');
       `}</style>
 
       {showSplash ? (
@@ -45,7 +45,7 @@ export default function App() {
                     src="/logo.png" 
                     alt="VeldAI Logo" 
                     className="w-full h-auto object-contain drop-shadow-2xl"
-                    onError={(e) => { e.currentTarget.src = '[https://via.placeholder.com/400?text=VELDAI+LOGO](https://via.placeholder.com/400?text=VELDAI+LOGO)'; }}
+                    onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/400?text=VELDAI+LOGO'; }}
                   />
                 </div>
 
@@ -100,7 +100,6 @@ export default function App() {
                     key={i}
                     className="w-2.5 bg-[#B693FE] rounded-full animate-pulse"
                     style={{ 
-                      // Fixed for Vercel Build Stability
                       height: (30 + Math.random() * 70) + '%',
                       animationDelay: (i * 0.15) + 's',
                       animationDuration: '1.2s'
@@ -112,7 +111,7 @@ export default function App() {
 
           <div className="flex flex-col items-center pb-8">
             <button className="w-20 h-20 bg-[#CC5500] rounded-full flex items-center justify-center shadow-2xl hover:scale-105 active:scale-90 transition-all border-[4px] border-white">
-              <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0 v-2"/><line x1="12" x2="12" y1="19" y2="22"/>
               </svg>
             </button>
