@@ -5,7 +5,6 @@ export default function App() {
   const [splashPhase, setSplashPhase] = useState('blank');
 
   useEffect(() => {
-    // Slower, more premium timing for the hackathon demo
     const timer1 = setTimeout(() => setSplashPhase('expanding'), 2500);
     const timer2 = setTimeout(() => setSplashPhase('content'), 4500);
 
@@ -16,30 +15,36 @@ export default function App() {
   }, []);
 
   return (
-    <main className="min-h-screen overflow-hidden bg-white">
+    <main className={`min-h-screen overflow-hidden transition-colors duration-1000 ${splashPhase !== 'blank' && showSplash ? 'bg-[#CC5500]' : 'bg-white'}`}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&family=Roboto:wght@400;500&display=swap');
+        
+        @keyframes drop-in {
+          0% { transform: translateY(-100px); opacity: 0; }
+          60% { transform: translateY(10px); opacity: 1; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+        .animate-logo-drop {
+          animation: drop-in 1.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+          animation-delay: 0.8s;
+          opacity: 0;
+        }
       `}</style>
 
       {showSplash ? (
-        /* --- SCREEN 1: THE REFINED SPLASH (FULL SCREEN) --- */
-        <div className="h-screen w-full flex flex-col items-center justify-between relative transition-colors duration-1000">
+        <div className="h-screen w-full flex flex-col items-center relative overflow-hidden">
           
-          {/* THE EXPANDING ORANGE CIRCLE */}
           <div 
-            className={`absolute rounded-full bg-[#CC5500] transition-all duration-[2000ms] ease-in-out z-0
-              ${splashPhase === 'blank' ? 'w-0 h-0 opacity-0' : ''}
-              ${splashPhase === 'expanding' || splashPhase === 'content' ? 'w-[450vmax] h-[450vmax] opacity-100' : ''}
+            className={`absolute rounded-full bg-[#CC5500] transition-all duration-[2000ms] ease-in-out z-0 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+              ${splashPhase === 'blank' ? 'w-0 h-0 opacity-0' : 'w-[500vmax] h-[500vmax] opacity-100'}
             `}
           />
 
           {splashPhase === 'content' && (
             <>
-              {/* Brand Block - Positioned for full screen impact */}
-              <div className="flex-1 flex flex-col items-center justify-center w-full z-10 -mt-16 animate-in fade-in duration-1000">
-                
-                {/* Logo - Stable Version (No blinking) */}
-                <div className="relative mb-6 w-full max-w-[300px] md:max-w-[350px] flex justify-center">
+              {/* ELEMENT 1: THE LOGO - Moved higher to 15% */}
+              <div className="absolute top-[15%] w-full flex justify-center z-10 animate-logo-drop">
+                <div className="relative w-full max-w-[260px] md:max-w-[300px] flex justify-center">
                   <div className="absolute inset-0 bg-white/5 rounded-full scale-110 blur-3xl" />
                   <img 
                     src="/logo.png" 
@@ -48,23 +53,24 @@ export default function App() {
                     onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/400?text=VELDAI+LOGO'; }}
                   />
                 </div>
-
-                {/* Text Block */}
-                <div className="flex flex-col items-center animate-in slide-in-from-bottom-4 duration-1000 fill-mode-both">
-                  {/* VELDAI Text */}
-                  <h1 className="text-[#007A4D] text-6xl md:text-7xl font-[900] tracking-tighter drop-shadow-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-                    VELDAI
-                  </h1>
-                  
-                  {/* Inclusive Text */}
-                  <p className="text-white/80 text-sm md:text-base font-light tracking-[0.15em] uppercase mt-6" style={{ fontFamily: 'Roboto, sans-serif' }}>
-                    Inclusive Agricultural Intelligence
-                  </p>
-                </div>
               </div>
 
-              {/* Action Button */}
-              <div className="w-full flex flex-col items-center max-w-[280px] z-10 animate-in slide-in-from-bottom-8 duration-1000 delay-500 fill-mode-both mb-12">
+              {/* ELEMENT 2: VELDAI TEXT - Shifted up to create space below */}
+              <div className="absolute bottom-[32%] w-full flex flex-col items-center z-10 animate-in fade-in slide-in-from-bottom-2 duration-1000 fill-mode-both">
+                <h1 className="text-[#007A4D] text-5xl md:text-6xl font-[900] tracking-tighter drop-shadow-sm leading-none" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  VELDAI
+                </h1>
+              </div>
+
+              {/* ELEMENT 3: INCLUSIVE TEXT - Shifted up to follow VELDAI */}
+              <div className="absolute bottom-[26%] w-full flex flex-col items-center z-10 animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-150 fill-mode-both px-4 text-center">
+                <p className="text-white/90 text-[9px] md:text-[11px] font-medium tracking-[0.15em] uppercase whitespace-nowrap" style={{ fontFamily: 'Roboto, sans-serif' }}>
+                  Inclusive Agricultural Intelligence
+                </p>
+              </div>
+
+              {/* ELEMENT 4: ACTION BUTTON - Anchored at bottom with clear space above */}
+              <div className="absolute bottom-12 w-full flex flex-col items-center z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300 fill-mode-both">
                 <button 
                   onClick={() => setShowSplash(false)}
                   className="w-full max-w-[220px] bg-white text-[#CC5500] py-3.5 rounded-full text-base font-medium tracking-wide shadow-xl active:scale-95 transition-all cursor-pointer hover:bg-white/95"
@@ -81,7 +87,7 @@ export default function App() {
           )}
         </div>
       ) : (
-        /* --- SCREEN 2: VELD-TALK (HOME) (FULL SCREEN) --- */
+        /* --- HOME SCREEN --- */
         <div className="h-screen w-full bg-[#F9F5FF] flex flex-col p-8 animate-in fade-in duration-700">
           <header className="mt-8">
             <h2 className="text-[#1B1B1B] text-4xl font-[900] tracking-tight mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>
