@@ -204,14 +204,12 @@ export default function App() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [showTranslation, setShowTranslation] = useState(false);
   const [notification, setNotification] = useState<{message: string, type: 'info' | 'error' | 'success'} | null>(null);
-  
-  // --- Online Detection & Sync Logic ---
   const [isOnline, setIsOnline] = useState(true);
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
+  const listeningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    // Check initial status
     setIsOnline(navigator.onLine);
-
     const handleOnline = () => {
         setIsOnline(true);
         triggerNotification("Connection Restored. Syncing data...", "success");
@@ -220,20 +218,14 @@ export default function App() {
         setIsOnline(false);
         triggerNotification("Entering Data Desert mode. Progress saved locally.", "info");
     };
-
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
-
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
 
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
-  const listeningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Sync effect: Trigger upload logic when internet returns
   useEffect(() => {
     if (isOnline && syncStatus === 'pending') {
       setSyncStatus('syncing');
@@ -260,6 +252,13 @@ export default function App() {
     }
     return () => { if (listeningTimerRef.current) clearTimeout(listeningTimerRef.current); };
   }, [isListening]);
+
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => setNotification(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   const screenVariants = {
     initial: { x: 300, opacity: 0 },
@@ -309,7 +308,6 @@ export default function App() {
                 <Logo size="lg" color="#2D6A4F" textColor="#2D6A4F" />
                 <p className="text-white font-light text-[10px] mt-2 uppercase tracking-widest">Inclusive agricultural Intelligence</p>
               </motion.div>
-              
               <motion.button initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 2.2, duration: 0.5 }} whileTap={{ scale: 0.95 }} onClick={() => setCurrentScreen('voice')} className="bg-white text-[#D95400] px-8 py-3 rounded-full font-bold text-sm shadow-xl mt-8">
                 Let's Get Started
               </motion.button>
@@ -348,14 +346,7 @@ export default function App() {
                 </div>
               </div>
 
-              <motion.div 
-                animate={{ 
-                  scale: isListening ? 0.85 : 1,
-                  originX: 0,
-                  y: isListening ? -5 : 0
-                }}
-                className="mt-4"
-              >
+              <motion.div animate={{ scale: isListening ? 0.85 : 1, originX: 0, y: isListening ? -5 : 0 }} className="mt-4">
                 <h2 className="text-xl font-bold leading-tight">
                   <span className="text-[#2D6A4F]">{t.molo}</span><br />
                   <span className="text-[#D95400]">{t.help}</span>
@@ -365,12 +356,7 @@ export default function App() {
 
               <AnimatePresence>
                 {syncStatus !== 'idle' && !isListening && (
-                  <motion.div 
-                    initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                    animate={{ opacity: 1, height: 'auto', marginBottom: 12 }}
-                    exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                    className="overflow-hidden"
-                  >
+                  <motion.div initial={{ opacity: 0, height: 0, marginBottom: 0 }} animate={{ opacity: 1, height: 'auto', marginBottom: 12 }} exit={{ opacity: 0, height: 0, marginBottom: 0 }} className="overflow-hidden">
                     <div className={`p-3 rounded-2xl border flex items-center gap-3 ${
                       syncStatus === 'pending' ? 'bg-orange-50 border-orange-100 text-orange-800' :
                       syncStatus === 'syncing' ? 'bg-blue-50 border-blue-100 text-blue-800' :
@@ -414,22 +400,11 @@ export default function App() {
                           </button>
                         </div>
                         <p className="text-[11px] text-neutral-700 font-medium italic leading-snug">
-                          "
-                          <TypewriterText 
-                              key={`${language}-${isListening}`}
-                              text={t.sttTranscript} 
-                              delay={language === 'en' ? 70 : 50} 
-                              onComplete={() => setShowTranslation(true)}
-                            />"
+                          "<TypewriterText key={`${language}-${isListening}`} text={t.sttTranscript} delay={language === 'en' ? 70 : 50} onComplete={() => setShowTranslation(true)} />"
                         </p>
-                        
                         <AnimatePresence>
                           {showTranslation && (
-                            <motion.div 
-                              initial={{ opacity: 0, height: 0 }} 
-                              animate={{ opacity: 1, height: 'auto' }}
-                              className="mt-2 pt-2 border-t border-neutral-100 flex justify-between items-end"
-                            >
+                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-2 pt-2 border-t border-neutral-100 flex justify-between items-end">
                               <div>
                                 {language !== 'en' && (
                                   <>
@@ -459,27 +434,15 @@ export default function App() {
                     <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: [1, 1.2, 1], opacity: 1 }} exit={{ scale: 0.8, opacity: 0 }} transition={{ duration: 2, repeat: Infinity }} className="absolute inset-0 bg-[#D95400]/20 rounded-full blur-2xl" />
                   )}
                 </AnimatePresence>
-                <motion.button 
-                  whileTap={{ scale: 0.9 }} 
-                  onClick={() => setIsListening(!isListening)} 
-                  className={`relative w-24 h-24 rounded-full shadow-xl flex items-center justify-center text-white transition-all z-10 ${isListening ? 'bg-[#D95400]' : 'bg-[#2D6A4F]'}`}
-                >
+                <motion.button whileTap={{ scale: 0.9 }} onClick={() => setIsListening(!isListening)} className={`relative w-24 h-24 rounded-full shadow-xl flex items-center justify-center text-white transition-all z-10 ${isListening ? 'bg-[#D95400]' : 'bg-[#2D6A4F]'}`}>
                   <Mic size={36} />
                 </motion.button>
               </div>
-
               {!isListening && (
-                <motion.button 
-                  initial={{ opacity: 0, y: 10 }} 
-                  animate={{ opacity: 1, y: 0 }} 
-                  whileTap={{ scale: 0.95 }} 
-                  onClick={() => { setIsListening(false); setCurrentScreen('scout'); }} 
-                  className="flex items-center gap-2 font-bold text-[10px] text-[#2D6A4F] bg-white px-5 py-2 rounded-full shadow-sm"
-                >
+                <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} whileTap={{ scale: 0.95 }} onClick={() => { setIsListening(false); setCurrentScreen('scout'); }} className="flex items-center gap-2 font-bold text-[10px] text-[#2D6A4F] bg-white px-5 py-2 rounded-full shadow-sm">
                   <Camera size={14} /> {t.switchScout}
                 </motion.button>
               )}
-
               <div className="absolute left-0 bottom-8">
                 <motion.button whileTap={{ scale: 0.9 }} onClick={() => setCurrentScreen('splash')} className="w-8 h-8 bg-white shadow-md border border-neutral-100 rounded-full flex items-center justify-center">
                   <ArrowLeft size={16} className="text-[#D95400]" />
@@ -549,23 +512,19 @@ export default function App() {
                   <h4 className="text-[10px] font-black text-red-800 uppercase tracking-widest mb-1">{t.growthRate}</h4>
                   <p className="text-xs font-bold text-red-700">{t.growthValue}</p>
                 </div>
-                
                 <div className="p-3 bg-blue-50 rounded-2xl border border-blue-100">
                   <h4 className="text-[10px] font-black text-blue-800 uppercase tracking-widest mb-1">{t.quarantine}</h4>
                   <p className="text-xs font-bold text-blue-700">Isolate affected plants immediately.</p>
                 </div>
-
                 <div className="p-3 bg-green-50 rounded-2xl border border-green-100">
                   <h4 className="text-[10px] font-black text-green-800 uppercase tracking-widest mb-1">{t.treatment}</h4>
                   <p className="text-xs font-bold text-green-700">Apply copper-based fungicides.</p>
                 </div>
-
                 <div className="p-3 bg-purple-50 rounded-2xl border border-purple-100">
                   <h4 className="text-[10px] font-black text-purple-800 uppercase tracking-widest mb-1">{t.biosecurity}</h4>
                   <p className="text-xs font-bold text-purple-700">Reporting to local authorities recommended.</p>
                 </div>
               </div>
-              
               <button onClick={() => setCurrentScreen('voice')} className="w-full bg-[#2D6A4F] text-white font-black py-3 rounded-2xl mt-4 flex items-center justify-center gap-3 text-xs shadow-lg active:scale-95 transition-transform shrink-0">
                 <Mic size={18} /> {t.voiceHelp}
               </button>
@@ -605,19 +564,16 @@ export default function App() {
           filter: 'blur(20px) brightness(0.7)'
         }}
       />
-
       <style>{`
         * { -ms-overflow-style: none; scrollbar-width: none; }
         *::-webkit-scrollbar { display: none; }
         .diagnosis-content { overflow-y: scroll; -ms-overflow-style: none; scrollbar-width: none; }
         .diagnosis-content::-webkit-scrollbar { display: none; }
       `}</style>
-      
       <div className="w-[320px] h-[680px] max-h-[90vh] bg-white rounded-[2.5rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] overflow-hidden border-[8px] border-neutral-900 relative z-10">
         <AnimatePresence mode="wait">
           {renderScreen()}
         </AnimatePresence>
-
         <AnimatePresence>
           {notification && (
             <motion.div 
@@ -626,19 +582,14 @@ export default function App() {
               exit={{ y: -100, opacity: 0, x: '-50%' }}
               transition={{ type: "spring", damping: 20, stiffness: 100 }}
               style={{ left: '50%', width: '90%' }}
-              className={`absolute z-[100] p-4 rounded-2xl shadow-2xl flex items-center gap-3 border ${
-                notification.type === 'success' ? 'bg-green-50 border-green-100 text-green-800' :
-                notification.type === 'error' ? 'bg-red-50 border-red-100 text-red-800' :
-                'bg-blue-50 border-blue-100 text-blue-800'
+              className={`absolute top-0 z-[100] p-4 rounded-2xl shadow-2xl flex items-center gap-3 border ${
+                notification.type === 'success' ? 'bg-green-600 border-green-400 text-white' : 
+                notification.type === 'error' ? 'bg-red-600 border-red-400 text-white' : 
+                'bg-blue-600 border-blue-400 text-white'
               }`}
             >
-              {notification.type === 'success' && <CheckCircle2 size={18} />}
-              {notification.type === 'error' && <AlertCircle size={18} />}
-              {notification.type === 'info' && <Info size={18} />}
-              <p className="text-[10px] font-bold flex-1 leading-tight">{notification.message}</p>
-              <button onClick={() => setNotification(null)} className="p-1 hover:bg-black/5 rounded-full transition-colors">
-                <X size={14} />
-              </button>
+              {notification.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+              <p className="text-xs font-bold">{notification.message}</p>
             </motion.div>
           )}
         </AnimatePresence>
