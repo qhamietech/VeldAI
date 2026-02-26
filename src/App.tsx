@@ -18,8 +18,6 @@ import {
   CheckCircle2,
   AlertCircle,
   Database,
-  Info,
-  Save
 } from 'lucide-react';
 
 // --- Types ---
