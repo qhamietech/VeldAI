@@ -15,7 +15,11 @@ import {
   X,
   Volume2,
   CloudUpload,
-  CheckCircle2
+  CheckCircle2,
+  AlertCircle,
+  Database,
+  Info,
+  Save
 } from 'lucide-react';
 
 // --- Types ---
@@ -199,15 +203,23 @@ export default function App() {
   const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [showTranslation, setShowTranslation] = useState(false);
+  const [notification, setNotification] = useState<{message: string, type: 'info' | 'error' | 'success'} | null>(null);
   
   // --- Online Detection & Sync Logic ---
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
-  const listeningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isOnline, setIsOnline] = useState(true);
 
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
+    // Check initial status
+    setIsOnline(navigator.onLine);
+
+    const handleOnline = () => {
+        setIsOnline(true);
+        triggerNotification("Connection Restored. Syncing data...", "success");
+    };
+    const handleOffline = () => {
+        setIsOnline(false);
+        triggerNotification("Entering Data Desert mode. Progress saved locally.", "info");
+    };
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -218,14 +230,15 @@ export default function App() {
     };
   }, []);
 
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
+  const listeningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Sync effect: Trigger upload logic when internet returns
   useEffect(() => {
     if (isOnline && syncStatus === 'pending') {
       setSyncStatus('syncing');
-      // Simulate network upload
       setTimeout(() => {
         setSyncStatus('success');
-        // Clear success message after 3 seconds
         setTimeout(() => setSyncStatus('idle'), 3000);
       }, 2500);
     }
@@ -254,6 +267,10 @@ export default function App() {
     exit: { x: -300, opacity: 0 },
   };
 
+  const triggerNotification = (message: string, type: 'info' | 'error' | 'success' = 'info') => {
+    setNotification({ message, type });
+  };
+
   const handlePlayAudio = () => {
     setIsSpeaking(true);
     setTimeout(() => setIsSpeaking(false), 5000);
@@ -263,7 +280,7 @@ export default function App() {
     setIsListening(false);
     if (!isOnline) {
       setSyncStatus('pending');
-      alert("No internet. Report saved to PawSOS Local. It will upload once you are back online.");
+      triggerNotification("Saved to VELDAI Local. You can resume offline.", "success");
     }
     setCurrentScreen('scout');
   };
@@ -275,6 +292,9 @@ export default function App() {
       setCurrentScreen('diagnosis');
       setIsScanning(false);
       setSelectedPhoto(false);
+      if (!isOnline) {
+          triggerNotification("Analysis completed using on-device vision.", "info");
+      }
     }, 3000);
   };
 
@@ -304,7 +324,6 @@ export default function App() {
               <div className="flex justify-between items-start">
                 <Logo size="sm" className="items-start" />
                 <div className="flex items-center gap-2 relative">
-                  {/* Enhanced Online/Offline Toggle Visual */}
                   <motion.button whileTap={{ scale: 0.9 }} onClick={() => setCurrentScreen('offline')} className="w-9 h-9 bg-white shadow-sm border border-neutral-100 rounded-full flex items-center justify-center relative">
                     <Wifi size={16} className={isOnline ? "text-green-600" : "text-neutral-300"} />
                     <div className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-white ${isOnline ? 'bg-green-500' : 'bg-red-500'}`} />
@@ -344,7 +363,6 @@ export default function App() {
                 <p className="text-[11px] text-neutral-500 mt-1">{t.subHelp}</p>
               </motion.div>
 
-              {/* PENDING UPLOAD CARD (The New Feature) */}
               <AnimatePresence>
                 {syncStatus !== 'idle' && !isListening && (
                   <motion.div 
@@ -371,7 +389,7 @@ export default function App() {
                         </p>
                         <p className="text-[9px] opacity-70">
                           {syncStatus === 'pending' && "1 report saved locally"}
-                          {syncStatus === 'syncing' && "Connecting to PawSOS servers"}
+                          {syncStatus === 'syncing' && "Connecting to VELDAI servers"}
                           {syncStatus === 'success' && "Database is up to date"}
                         </p>
                       </div>
@@ -421,7 +439,7 @@ export default function App() {
                                 )}
                               </div>
                               <motion.button whileTap={{ scale: 0.9 }} onClick={handleNextAction} className="bg-[#2D6A4F] text-white px-3 py-1 rounded-full text-[9px] font-bold flex items-center gap-1 shrink-0">
-                                Next <ChevronRight size={10} />
+                                {isOnline ? "Next" : "Save & Continue"} <ChevronRight size={10} />
                               </motion.button>
                             </motion.div>
                           )}
@@ -494,7 +512,14 @@ export default function App() {
                 )}
               </div>
               <div className="bg-white rounded-[2rem] p-5 mb-2">
-                <h3 className="text-lg font-bold">{t.healthStatus}</h3>
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-bold">{t.healthStatus}</h3>
+                  {!isOnline && (
+                    <div className="bg-amber-100 text-amber-700 text-[8px] px-2 py-0.5 rounded-full font-black flex items-center gap-1 uppercase">
+                      <Database size={8} /> Local AI Mode
+                    </div>
+                  )}
+                </div>
                 <p className="text-neutral-500 text-[10px] mt-1">{selectedPhoto ? t.photoLoaded : t.selectPhotoPrompt}</p>
                 <div className="mt-4 flex justify-center">
                   <button disabled={!selectedPhoto || isScanning} onClick={startScan} className={`w-14 h-14 rounded-full flex items-center justify-center text-white ${selectedPhoto ? 'bg-[#D95400]' : 'bg-neutral-300'}`}><Camera size={24} /></button>
@@ -513,7 +538,10 @@ export default function App() {
             </div>
             
             <div className="flex-1 -mt-8 bg-white rounded-t-[2.5rem] p-6 relative z-10 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] overflow-y-auto diagnosis-content flex flex-col">
-              <h2 className="text-2xl font-black text-neutral-800">{t.diagnosisTitle}</h2>
+              <div className="flex justify-between items-start">
+                  <h2 className="text-2xl font-black text-neutral-800">{t.diagnosisTitle}</h2>
+                  {!isOnline && <div className="text-[9px] font-black bg-blue-50 text-blue-600 px-2 py-1 rounded-md border border-blue-100">CACHED</div>}
+              </div>
               <div className="bg-orange-500 w-fit px-3 py-1 rounded-full mt-2 text-white text-[11px] font-black uppercase tracking-wider shrink-0">{t.affected}</div>
               
               <div className="space-y-3 mt-4 flex-grow">
@@ -567,28 +595,52 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-100 p-2">
+    <div className="min-h-screen flex items-center justify-center p-2 relative overflow-hidden">
+      <div 
+        className="absolute inset-0 z-0 scale-110"
+        style={{
+          backgroundImage: 'url("/corn.png")',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'blur(20px) brightness(0.7)'
+        }}
+      />
+
       <style>{`
-        * {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        *::-webkit-scrollbar {
-          display: none;
-        }
-        .diagnosis-content {
-          overflow-y: scroll;
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .diagnosis-content::-webkit-scrollbar {
-          display: none;
-        }
+        * { -ms-overflow-style: none; scrollbar-width: none; }
+        *::-webkit-scrollbar { display: none; }
+        .diagnosis-content { overflow-y: scroll; -ms-overflow-style: none; scrollbar-width: none; }
+        .diagnosis-content::-webkit-scrollbar { display: none; }
       `}</style>
       
-      <div className="w-[320px] h-[680px] max-h-[90vh] bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border-[6px] border-neutral-900 relative">
+      <div className="w-[320px] h-[680px] max-h-[90vh] bg-white rounded-[2.5rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] overflow-hidden border-[8px] border-neutral-900 relative z-10">
         <AnimatePresence mode="wait">
           {renderScreen()}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {notification && (
+            <motion.div 
+              initial={{ y: -100, opacity: 0, x: '-50%' }}
+              animate={{ y: 20, opacity: 1, x: '-50%' }}
+              exit={{ y: -100, opacity: 0, x: '-50%' }}
+              transition={{ type: "spring", damping: 20, stiffness: 100 }}
+              style={{ left: '50%', width: '90%' }}
+              className={`absolute z-[100] p-4 rounded-2xl shadow-2xl flex items-center gap-3 border ${
+                notification.type === 'success' ? 'bg-green-50 border-green-100 text-green-800' :
+                notification.type === 'error' ? 'bg-red-50 border-red-100 text-red-800' :
+                'bg-blue-50 border-blue-100 text-blue-800'
+              }`}
+            >
+              {notification.type === 'success' && <CheckCircle2 size={18} />}
+              {notification.type === 'error' && <AlertCircle size={18} />}
+              {notification.type === 'info' && <Info size={18} />}
+              <p className="text-[10px] font-bold flex-1 leading-tight">{notification.message}</p>
+              <button onClick={() => setNotification(null)} className="p-1 hover:bg-black/5 rounded-full transition-colors">
+                <X size={14} />
+              </button>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
     </div>
